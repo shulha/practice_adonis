@@ -20,3 +20,7 @@ Route.post('/login', 'AuthController.login');
 Route.post('/logout', 'AuthController.logout');
 
 Route.resource('products', 'ProductController');
+
+Route.resource('types', 'TypeController');
+
+Route.resource('attributes', 'AttributeController');
