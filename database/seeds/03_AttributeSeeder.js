@@ -15,9 +15,17 @@ class AttributeSeeder {
   async run() {
     await Attribute.query().delete();
 
-    const attributes = [{ name: 'diagonal' }, { name: 'processor' }, { name: 'RAM' }];
-    const type = await Type.findByOrFail('name', 'PC');
-    await type.attributes().createMany(attributes);
+    const pcAttributes = [{ name: 'HDD' }, { name: 'processor' }, { name: 'RAM' }];
+    const pcType = await Type.findByOrFail('name', 'pc');
+    await pcType.attributes().createMany(pcAttributes);
+
+    const carAttributes = [{ name: 'mark' }, { name: 'model' }];
+    const carType = await Type.findByOrFail('name', 'car');
+    await carType.attributes().createMany(carAttributes);
+
+    const buildingAttributes = [{ name: 'square' }, { name: 'floor' }];
+    const buildingType = await Type.findByOrFail('name', 'building');
+    await buildingType.attributes().createMany(buildingAttributes);
   }
 }
 

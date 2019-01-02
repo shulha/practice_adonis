@@ -32,9 +32,9 @@ class AttributeSchema extends Schema {
         .notNullable()
         .index();
       table
-        .json('value')
+        .jsonb('value')
         .notNullable()
-        .default(JSON.stringify([]));
+        .default('{}');
 
       table
         .foreign('product_id')
