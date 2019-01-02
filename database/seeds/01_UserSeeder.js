@@ -8,14 +8,14 @@
 |
 */
 
-const Factory = use('Factory');
 const User = use('App/Models/User');
 
 class UserSeeder {
   async run() {
     await User.query().delete();
 
-    await Factory.model('App/Models/User').createMany(5);
+    const users = [{ username: 'admin' }, { username: 'user' }];
+    await User.createMany(users);
   }
 }
 
