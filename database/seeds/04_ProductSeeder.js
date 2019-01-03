@@ -18,14 +18,12 @@ class ProductSeeder {
 
     const user = await User.findByOrFail('username', 'user');
     const pc = await Type.findByOrFail('name', 'pc');
-    const hdd = await pc
-      .attributes()
-      .where('name', 'HDD')
-      .first();
-    const proc = await pc
-      .attributes()
-      .where('name', 'processor')
-      .first();
+    const { rows: pcItems } = await pc.attributes().fetch();
+
+    const pcAttrs = {};
+    for (const attr of pcItems) {
+      pcAttrs[attr.name] = attr.id;
+    }
 
     const comp = new Product();
     comp.user_id = user.id;
@@ -34,22 +32,23 @@ class ProductSeeder {
     comp.price = 101;
     await user.products().save(comp);
 
-    await comp.attributes().attach(hdd.id, row => {
+    await comp.attributes().attach(pcAttrs.HDD, row => {
       row.value = { capacity: '3.75 megabytes' };
     });
-    await comp.attributes().attach(proc.id, row => {
+    await comp.attributes().attach(pcAttrs.processor, row => {
       row.value = { model: 'intel core i5' };
+    });
+    await comp.attributes().attach(pcAttrs.RAM, row => {
+      row.value = { type: 'DDR SDRAM' };
     });
 
     const building = await Type.findByOrFail('name', 'building');
-    const square = await building
-      .attributes()
-      .where('name', 'square')
-      .first();
-    const floor = await building
-      .attributes()
-      .where('name', 'floor')
-      .first();
+    const { rows: buildItems } = await building.attributes().fetch();
+
+    const buildAttrs = {};
+    for (const attr of buildItems) {
+      buildAttrs[attr.name] = attr.id;
+    }
 
     const myHouse = new Product();
     myHouse.user_id = user.id;
@@ -58,23 +57,21 @@ class ProductSeeder {
     myHouse.price = 2300;
     await user.products().save(myHouse);
 
-    await myHouse.attributes().attach(floor.id, row => {
+    await myHouse.attributes().attach(buildAttrs.floor, row => {
       row.value = { floor: 5 };
     });
-    await myHouse.attributes().attach(square.id, row => {
+    await myHouse.attributes().attach(buildAttrs.square, row => {
       row.value = { square: 350 };
     });
 
     const admin = await User.findByOrFail('username', 'admin');
     const car = await Type.findByOrFail('name', 'car');
-    const mark = await car
-      .attributes()
-      .where('name', 'mark')
-      .first();
-    const model = await car
-      .attributes()
-      .where('name', 'model')
-      .first();
+    const { rows: carItems } = await car.attributes().fetch();
+
+    const carAttrs = {};
+    for (const attr of carItems) {
+      carAttrs[attr.name] = attr.id;
+    }
 
     const auto = new Product();
     auto.user_id = admin.id;
@@ -83,10 +80,10 @@ class ProductSeeder {
     auto.price = 999;
     await user.products().save(auto);
 
-    await auto.attributes().attach(mark.id, row => {
+    await auto.attributes().attach(carAttrs.mark, row => {
       row.value = { mark: 'BMW' };
     });
-    await auto.attributes().attach(model.id, row => {
+    await auto.attributes().attach(carAttrs.model, row => {
       row.value = { model: 'X5' };
     });
   }
