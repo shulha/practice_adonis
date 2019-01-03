@@ -1,4 +1,5 @@
 const Type = use('App/Models/Type');
+const { validate } = use('Validator');
 
 /**
  * Resourceful controller for interacting with types
@@ -8,7 +9,7 @@ class TypeController {
    * Show a list of all types.
    * GET types
    *
-   * @returns {Promise<{status: number, products: string[]}>}
+   * @returns {Promise<*>}
    */
   async index() {
     return Type.all();
@@ -18,22 +19,25 @@ class TypeController {
    * Create/save a new type.
    * POST types
    *
-   * @param {object} ctx
    * @param {Request} ctx.request
+   * @param {Response} ctx.response
    *
-   * @returns {Promise<{status: number, product: {id: string, title: string, product_id: string, created_at: string}}>}
+   * @returns {Promise<*>}
    */
-  async store({ request }) {
-    console.log(request.params);
-    return {
-      status: 201,
-      product: {
-        id: 'id',
-        title: 'title',
-        product_id: 'product_id',
-        created_at: 'created_at'
-      }
+  async store({ request, response }) {
+    const requestAll = request.all();
+    const rules = {
+      name: 'required|unique:types'
     };
+    const validation = await validate(requestAll, rules);
+    if (validation.fails()) {
+      return validation.messages();
+    }
+
+    const { name } = requestAll;
+    await Type.createType(name);
+
+    return response.status(201).send();
   }
 
   /**
@@ -42,20 +46,11 @@ class TypeController {
    *
    * @param {object} ctx
    *
-   * @returns {Promise<{status: number, product: {id: *, title: string, type: string, product_id: string, created_at: string}}>}
+   * @returns {Promise<*>}
    */
   async show({ params }) {
     const { id } = params;
-    return {
-      status: 200,
-      product: {
-        id,
-        title: 'title',
-        type: 'type',
-        product_id: 'product_id',
-        created_at: 'created_at'
-      }
-    };
+    return Type.findOrFail(id);
   }
 
   /**
@@ -64,20 +59,25 @@ class TypeController {
    *
    * @param {object} ctx
    * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   *
+   * @returns {Promise<*>}
    */
-  async update({ params, request }) {
+  async update({ params, request, response }) {
     const { id } = params;
-    console.log(request.params);
-    return {
-      status: 200,
-      product: {
-        id,
-        title: 'updated-title',
-        type: 'type',
-        product_id: 'product_id',
-        created_at: 'created_at'
-      }
+    const requestAll = request.all();
+    const rules = {
+      name: 'required|unique:types'
     };
+    const validation = await validate(requestAll, rules);
+    if (validation.fails()) {
+      return validation.messages();
+    }
+
+    const { name } = requestAll;
+    await Type.updateType(id, name);
+
+    return response.status(200).send();
   }
 
   /**
@@ -85,13 +85,17 @@ class TypeController {
    * DELETE types/:id
    *
    * @param {object} ctx
+   * @param {Response} ctx.response
+   *
+   * @returns {Promise<*>}
    */
-  async destroy({ params }) {
+  async destroy({ params, response }) {
     const { id } = params;
-    console.log(`Type ${id} has been deleted`);
-    return {
-      status: 204
-    };
+
+    const type = await Type.findOrFail(id);
+    await type.delete();
+
+    return response.status(204).send();
   }
 }
 
