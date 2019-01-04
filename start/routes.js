@@ -19,8 +19,8 @@ Route.get('/', () => ({ status: 'Ok', version: '1.0.0' }));
 Route.post('/login', 'AuthController.login');
 Route.post('/logout', 'AuthController.logout');
 
-Route.resource('products', 'ProductController');
+Route.resource('products', 'ProductController').apiOnly();
 
-Route.resource('types', 'TypeController');
+Route.resource('types', 'TypeController').apiOnly();
 
-Route.resource('attributes', 'AttributeController');
+Route.resource('types.attributes', 'AttributeController').apiOnly();

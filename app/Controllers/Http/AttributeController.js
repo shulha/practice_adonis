@@ -1,101 +1,111 @@
+/* eslint camelcase: ["error", {ignoreDestructuring: true}] */
+
 const Attribute = use('App/Models/Attribute');
+const Type = use('App/Models/Type');
+const { validate } = use('Validator');
 
 /**
  * Resourceful controller for interacting with attributes
  */
 class AttributeController {
   /**
-   * Show a list of all attributes.
-   * GET attributes
+   * Show a list of type's attributes.
+   * GET types/:types_id/attributes
    *
-   * @returns {Promise<{status: number, products: string[]}>}
+   * @returns {Promise<*>}
    */
-  async index() {
-    return Attribute.all();
+  async index({ params }) {
+    const { types_id } = params;
+    const type = await Type.findOrFail(types_id);
+
+    return type
+      .attributes()
+      .select('name')
+      .fetch();
   }
 
   /**
    * Create/save a new attribute.
-   * POST attributes
+   * POST types/:types_id/attributes
    *
    * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
    *
-   * @returns {Promise<{status: number, product: {id: string, title: string, value: string, type_id: string, created_at: string}}>}
+   * @returns {Promise<*>}
    */
-  async store({ request }) {
-    console.log(request.params);
-    return {
-      status: 201,
-      product: {
-        id: 'id',
-        title: 'title',
-        value: 'value',
-        type_id: 'type_id',
-        created_at: 'created_at'
-      }
+  async store({ params, request, response }) {
+    const requestAll = request.all();
+    const rules = {
+      name: 'required'
     };
+    const validation = await validate(requestAll, rules);
+    if (validation.fails()) {
+      return validation.messages();
+    }
+
+    const { types_id } = params;
+    const { name } = requestAll;
+    await Attribute.createAttribute(types_id, name);
+
+    return response.status(201).send();
   }
 
   /**
    * Display a single attribute.
-   * GET attributes/:id
+   * GET types/:types_id/attributes/:id
    *
    * @param {object} ctx
 
-   * @returns {Promise<{status: number, product: {id: *, title: string, value: string, type_id: string, created_at: string}}>}
+   * @returns {Promise<*>}
    */
   async show({ params }) {
-    const { id } = params;
-    return {
-      status: 200,
-      product: {
-        id,
-        title: 'title',
-        value: 'value',
-        type_id: 'type_id',
-        created_at: 'created_at'
-      }
-    };
+    const { types_id, id } = params;
+
+    return Attribute.getAttributes(types_id, id);
   }
 
   /**
    * Update attribute details.
-   * PUT or PATCH attributes/:id
+   * PUT or PATCH types/:types_id/attributes/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
+   * @param {Response} ctx.response
    *
-   * @returns {Promise<{status: number, product: {id: *, title: string, value: string, type_id: string, created_at: string}}>}
+   * @returns {Promise<*>}
    */
-  async update({ params, request }) {
-    const { id } = params;
-    console.log(request.params);
-    return {
-      status: 200,
-      product: {
-        id,
-        title: 'updated-title',
-        value: 'value',
-        type_id: 'type_id',
-        created_at: 'created_at'
-      }
+  async update({ params, request, response }) {
+    const requestAll = request.all();
+    const rules = {
+      name: 'required'
     };
+    const validation = await validate(requestAll, rules);
+    if (validation.fails()) {
+      return validation.messages();
+    }
+
+    const { types_id, id } = params;
+    const { name } = requestAll;
+    await Attribute.updateAttribute(types_id, id, name);
+
+    return response.status(200).send();
   }
 
   /**
    * Delete a attribute with id.
-   * DELETE attributes/:id
+   * DELETE types/:types_id/attributes/:id
    *
    * @param {object} ctx
+   * @param {Response} ctx.response
    *
-   * @returns {Promise<{status: number}>}
+   * @returns {Promise<*>}
    */
-  async destroy({ params }) {
-    const { id } = params;
-    console.log(`Attribute ${id} has been deleted`);
-    return {
-      status: 204
-    };
+  async destroy({ params, response }) {
+    const { types_id, id } = params;
+    await Attribute.deleteAttribute(types_id, id);
+
+    return response.status(204).send();
   }
 }
 
