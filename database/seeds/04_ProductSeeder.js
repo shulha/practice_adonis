@@ -33,13 +33,13 @@ class ProductSeeder {
     await user.products().save(comp);
 
     await comp.attributes().attach(pcAttrs.HDD, row => {
-      row.value = { capacity: '3.75 megabytes' };
+      row.value = '3.75 megabytes';
     });
     await comp.attributes().attach(pcAttrs.processor, row => {
-      row.value = { model: 'intel core i5' };
+      row.value = 'intel core i5';
     });
     await comp.attributes().attach(pcAttrs.RAM, row => {
-      row.value = { type: 'DDR SDRAM' };
+      row.value = 'DDR SDRAM';
     });
 
     const building = await Type.findByOrFail('name', 'building');
@@ -58,10 +58,10 @@ class ProductSeeder {
     await user.products().save(myHouse);
 
     await myHouse.attributes().attach(buildAttrs.floor, row => {
-      row.value = { floor: 5 };
+      row.value = 5;
     });
     await myHouse.attributes().attach(buildAttrs.square, row => {
-      row.value = { square: 350 };
+      row.value = 350;
     });
 
     const admin = await User.findByOrFail('username', 'admin');
@@ -81,10 +81,10 @@ class ProductSeeder {
     await user.products().save(auto);
 
     await auto.attributes().attach(carAttrs.mark, row => {
-      row.value = { mark: 'BMW' };
+      row.value = 'BMW';
     });
     await auto.attributes().attach(carAttrs.model, row => {
-      row.value = { model: 'X5' };
+      row.value = 'X5';
     });
   }
 }
