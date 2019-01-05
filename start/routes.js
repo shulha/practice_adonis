@@ -19,7 +19,9 @@ Route.get('/', () => ({ status: 'Ok', version: '1.0.0' }));
 Route.post('/login', 'AuthController.login');
 Route.post('/logout', 'AuthController.logout');
 
-Route.resource('products', 'ProductController').apiOnly();
+Route.resource('products', 'ProductController')
+  .apiOnly()
+  .validator(new Map([[['products.store'], ['StoreProduct']], [['products.update'], ['StoreProduct']]]));
 
 Route.resource('types', 'TypeController').apiOnly();
 
