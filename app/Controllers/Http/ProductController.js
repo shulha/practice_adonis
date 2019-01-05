@@ -16,21 +16,19 @@ class ProductController {
    * Create/save a new product.
    * POST products
    *
-   * @param {object} ctx
    * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   *
+   * @returns {Promise<*>}
    */
-  async store({ request }) {
-    console.log(request.params);
-    return {
-      status: 201,
-      product: {
-        id: 'id',
-        title: 'title',
-        type: 'type',
-        price: 'price',
-        created_at: 'created_at'
-      }
-    };
+  async store({ request, response }) {
+    const { name, type, price, attributes } = request.all();
+
+    const userId = 2; // TODO auth
+
+    await Product.createProduct({ userId, name, type, price, attributes });
+
+    return response.status(201).send();
   }
 
   /**
@@ -38,19 +36,13 @@ class ProductController {
    * GET products/:id
    *
    * @param {object} ctx
+   *
+   * @returns {Promise<*>}
    */
   async show({ params }) {
     const { id } = params;
-    return {
-      status: 200,
-      product: {
-        id,
-        title: 'title',
-        type: 'type',
-        price: 'price',
-        created_at: 'created_at'
-      }
-    };
+
+    return Product.showProduct(id);
   }
 
   /**
@@ -59,20 +51,23 @@ class ProductController {
    *
    * @param {object} ctx
    * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   *
+   * @returns {Promise<*>}
    */
-  async update({ params, request }) {
+  async update({ params, request, response }) {
     const { id } = params;
-    console.log(request.params);
-    return {
-      status: 200,
-      product: {
-        id,
-        title: 'updated-title',
-        type: 'type',
-        price: 'price',
-        created_at: 'created_at'
-      }
-    };
+    const product = await Product.findOrFail(id);
+
+    const userId = 2; // TODO auth
+    if (userId !== parseInt(product.user_id, 10)) {
+      return response.send('Invalid user');
+    }
+
+    const { name, type, price, attributes } = request.all();
+    await Product.updateProduct({ product, name, type, price, attributes });
+
+    return response.status(200).send();
   }
 
   /**
@@ -80,13 +75,17 @@ class ProductController {
    * DELETE products/:id
    *
    * @param {object} ctx
+   * @param {Response} ctx.response
+   *
+   * @returns {Promise<*>}
    */
-  async destroy({ params }) {
+  async destroy({ params, response }) {
     const { id } = params;
-    console.log(`Product ${id} has been deleted`);
-    return {
-      status: 204
-    };
+
+    const type = await Product.findOrFail(id);
+    await type.delete();
+
+    return response.status(204).send();
   }
 }
 
