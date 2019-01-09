@@ -1,5 +1,4 @@
 const Type = use('App/Models/Type');
-const { validate } = use('Validator');
 
 /**
  * Resourceful controller for interacting with types
@@ -25,16 +24,7 @@ class TypeController {
    * @returns {Promise<*>}
    */
   async store({ request, response }) {
-    const requestAll = request.all();
-    const rules = {
-      name: 'required|unique:types'
-    };
-    const validation = await validate(requestAll, rules);
-    if (validation.fails()) {
-      return validation.messages();
-    }
-
-    const { name } = requestAll;
+    const { name } = request.all();
     await Type.createType(name);
 
     return response.status(201).send();
@@ -65,16 +55,7 @@ class TypeController {
    */
   async update({ params, request, response }) {
     const { id } = params;
-    const requestAll = request.all();
-    const rules = {
-      name: 'required|unique:types'
-    };
-    const validation = await validate(requestAll, rules);
-    if (validation.fails()) {
-      return validation.messages();
-    }
-
-    const { name } = requestAll;
+    const { name } = request.all();
     await Type.updateType(id, name);
 
     return response.status(200).send();

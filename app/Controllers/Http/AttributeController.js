@@ -2,7 +2,6 @@
 
 const Attribute = use('App/Models/Attribute');
 const Type = use('App/Models/Type');
-const { validate } = use('Validator');
 
 /**
  * Resourceful controller for interacting with attributes
@@ -35,17 +34,8 @@ class AttributeController {
    * @returns {Promise<*>}
    */
   async store({ params, request, response }) {
-    const requestAll = request.all();
-    const rules = {
-      name: 'required'
-    };
-    const validation = await validate(requestAll, rules);
-    if (validation.fails()) {
-      return validation.messages();
-    }
-
     const { types_id } = params;
-    const { name } = requestAll;
+    const { name } = request.all();
     await Attribute.createAttribute(types_id, name);
 
     return response.status(201).send();
@@ -76,17 +66,8 @@ class AttributeController {
    * @returns {Promise<*>}
    */
   async update({ params, request, response }) {
-    const requestAll = request.all();
-    const rules = {
-      name: 'required'
-    };
-    const validation = await validate(requestAll, rules);
-    if (validation.fails()) {
-      return validation.messages();
-    }
-
     const { types_id, id } = params;
-    const { name } = requestAll;
+    const { name } = request.all();
     await Attribute.updateAttribute(types_id, id, name);
 
     return response.status(200).send();
