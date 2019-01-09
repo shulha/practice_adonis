@@ -1,7 +1,6 @@
 /* eslint camelcase: ["error", {ignoreDestructuring: true}] */
 
 const Attribute = use('App/Models/Attribute');
-const Type = use('App/Models/Type');
 
 /**
  * Resourceful controller for interacting with attributes
@@ -15,12 +14,7 @@ class AttributeController {
    */
   async index({ params }) {
     const { types_id } = params;
-    const type = await Type.findOrFail(types_id);
-
-    return type
-      .attributes()
-      .select('name')
-      .fetch();
+    return Attribute.getAllAttributes(types_id);
   }
 
   /**
@@ -36,9 +30,9 @@ class AttributeController {
   async store({ params, request, response }) {
     const { types_id } = params;
     const { name } = request.all();
-    await Attribute.createAttribute(types_id, name);
+    const result = await Attribute.createAttribute(types_id, name);
 
-    return response.status(201).send();
+    return response.status(201).send(result);
   }
 
   /**

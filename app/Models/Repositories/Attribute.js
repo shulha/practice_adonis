@@ -2,8 +2,9 @@ const Type = use('App/Models/Type');
 
 class Attribute {
   static async getAllAttributes(typesId) {
-    const { rows: result } = await this.query()
-      .where('type_id', typesId)
+    const type = await Type.findOrFail(typesId);
+    const { rows: result } = await type
+      .attributes()
       .select('name')
       .fetch();
 
@@ -11,19 +12,17 @@ class Attribute {
   }
 
   static async getAttributes(typesId, id) {
-    const { rows: result } = await this.query()
-      .join('types as t', 't.id', 'attributes.type_id')
-      .where('attributes.id', id)
-      .where('type_id', typesId)
-      .select({ type: 't.name' }, { attribute: 'attributes.name' })
-      .fetch();
-
-    return result.pop();
+    return Type.query()
+      .where('id', typesId)
+      .with('attributes', builder => {
+        builder.where({ id });
+      })
+      .firstOrFail();
   }
 
   static async createAttribute(typesId, name) {
     const type = await Type.findOrFail(typesId);
-    await type.attributes().create({ name });
+    return type.attributes().create({ name });
   }
 
   static async updateAttribute(typesId, id, name) {
@@ -31,7 +30,7 @@ class Attribute {
     const attribute = await type
       .attributes()
       .where({ id })
-      .first();
+      .firstOrFail();
     attribute.name = name;
     await attribute.save();
   }
