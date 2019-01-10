@@ -1,12 +1,6 @@
-/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Model = use('Model');
+const BaseModel = require('./BaseModel');
 
-class Type extends Model {
-  static boot() {
-    super.boot();
-    this.addTrait('App/Models/Traits/Repository');
-  }
-
+class Type extends BaseModel {
   /**
    * Disable the created at time stamp.
    *
