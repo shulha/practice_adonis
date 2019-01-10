@@ -25,7 +25,7 @@ class TypeController {
    */
   async store({ request, response }) {
     const { name } = request.all();
-    await Type.createType(name);
+    await Type.create({ name });
 
     return response.status(201).send();
   }

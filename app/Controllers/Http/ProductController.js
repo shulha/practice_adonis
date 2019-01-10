@@ -57,15 +57,8 @@ class ProductController {
    */
   async update({ params, request, response }) {
     const { id } = params;
-    const product = await Product.findOrFail(id);
-
-    const userId = 2; // TODO auth
-    if (userId !== parseInt(product.user_id, 10)) {
-      return response.send('Invalid user');
-    }
-
     const { name, type, price, attributes } = request.all();
-    await Product.updateProduct({ product, name, type, price, attributes });
+    await Product.updateProduct({ id, name, type, price, attributes });
 
     return response.status(200).send();
   }
@@ -82,8 +75,8 @@ class ProductController {
   async destroy({ params, response }) {
     const { id } = params;
 
-    const type = await Product.findOrFail(id);
-    await type.delete();
+    const product = await Product.findOrFail(id);
+    await product.delete();
 
     return response.status(204).send();
   }

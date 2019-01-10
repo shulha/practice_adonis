@@ -3,26 +3,16 @@ const User = use('App/Models/User');
 class Product {
   static async showProduct(id) {
     const product = await this.findOrFail(id);
-    const type = await product.type().fetch();
-    const { rows: attributes } = await product
-      .attributes()
-      .select('name')
-      .fetch();
+    await product.load('type');
+    await product.load('attributes');
 
-    return {
-      name: product.name,
-      type: type.name,
-      price: product.price,
-      created_at: product.created_at,
-      attributes
-    };
+    return product.toJSON();
   }
 
   static async createProduct({ userId, name, type, price, attributes }) {
     const user = await User.findOrFail(userId);
 
     const product = new this();
-    product.user_id = userId;
     product.type_id = type;
     product.name = name;
     product.price = price;
@@ -36,7 +26,8 @@ class Product {
     await Promise.all(promises);
   }
 
-  static async updateProduct({ product, name, type, price, attributes }) {
+  static async updateProduct({ id, name, type, price, attributes }) {
+    const product = await this.findOrFail(id);
     product.merge({ name, type_id: type, price });
     await product.save();
 
