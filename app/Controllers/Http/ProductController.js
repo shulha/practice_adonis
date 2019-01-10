@@ -7,9 +7,14 @@ class ProductController {
   /**
    * Show a list of all products.
    * GET products
+   *
+   * @param {Request} ctx.request
+   *
+   * @returns {Promise<*>}
    */
-  async index() {
-    return Product.all();
+  async index({ request }) {
+    const query = request.get();
+    return Product.allPoducts(query);
   }
 
   /**
