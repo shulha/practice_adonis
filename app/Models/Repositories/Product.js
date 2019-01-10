@@ -1,4 +1,5 @@
 const User = use('App/Models/User');
+const Type = use('App/Models/Type');
 
 class Product {
   static async showProduct(id) {
@@ -37,6 +38,41 @@ class Product {
       })
     );
     await Promise.all(promises);
+  }
+
+  static async allPoducts(query) {
+    if (!query) {
+      return this.all();
+    }
+
+    let col = 'price';
+    let direct = 'asc';
+    if (query.price) {
+      direct = query.price;
+    } else if (query.date) {
+      col = 'created_at';
+      direct = query.date;
+    }
+
+    let res = [];
+    if (query.type) {
+      const subquery = await Type.query()
+        .whereRaw(`"name" LIKE '%${query.type}%'`)
+        .ids();
+      const { rows: results } = await this.query()
+        .whereRaw(`"name" LIKE '%${query.name}%'`)
+        .whereIn('type_id', subquery)
+        .orderBy(col, direct)
+        .fetch();
+      res = results;
+    } else {
+      const { rows: results } = await this.query()
+        .whereRaw(`"name" LIKE '%${query.name}%'`)
+        .orderBy(col, direct)
+        .fetch();
+      res = results;
+    }
+    return res;
   }
 }
 
