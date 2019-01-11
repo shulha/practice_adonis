@@ -14,7 +14,7 @@ class ProductController {
    */
   async index({ request }) {
     const query = request.get();
-    return Product.allPoducts(query);
+    return Product.allProducts(query);
   }
 
   /**
