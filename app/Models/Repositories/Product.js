@@ -1,13 +1,11 @@
 const User = use('App/Models/User');
-const Type = use('App/Models/Type');
 
 class Product {
   static async showProduct(id) {
     const product = await this.findOrFail(id);
-    await product.load('type');
-    await product.load('attributes');
+    await product.loadMany(['user', 'type', 'attributes']);
 
-    return product.toJSON();
+    return product;
   }
 
   static async createProduct({ userId, name, type, price, attributes }) {
@@ -40,39 +38,25 @@ class Product {
     await Promise.all(promises);
   }
 
-  static async allPoducts(query) {
-    if (!query) {
-      return this.all();
-    }
+  // http://127.0.0.1:3333/products?filter[user_id]=2&filter[type_id]=2&filter[name]=veh&field=created_at&order=desc
+  static async allProducts(req) {
+    const { filter = [], field = 'price', order = 'asc' } = req;
+    const page = 1;
 
-    let col = 'price';
-    let direct = 'asc';
-    if (query.price) {
-      direct = query.price;
-    } else if (query.date) {
-      col = 'created_at';
-      direct = query.date;
-    }
+    const query = this.query();
+    Object.keys(filter).forEach(key => {
+      if (key !== 'name') {
+        query.where(key, filter[key]);
+      } else {
+        query.whereRaw(`"name" LIKE '%${filter.name}%'`);
+      }
+    });
 
-    let res = [];
-    if (query.type) {
-      const subquery = await Type.query()
-        .whereRaw(`"name" LIKE '%${query.type}%'`)
-        .ids();
-      const { rows: results } = await this.query()
-        .whereRaw(`"name" LIKE '%${query.name}%'`)
-        .whereIn('type_id', subquery)
-        .orderBy(col, direct)
-        .fetch();
-      res = results;
-    } else {
-      const { rows: results } = await this.query()
-        .whereRaw(`"name" LIKE '%${query.name}%'`)
-        .orderBy(col, direct)
-        .fetch();
-      res = results;
-    }
-    return res;
+    return query
+      .orderBy(field, order)
+      .with('user')
+      .with('type')
+      .paginate(page);
   }
 }
 
