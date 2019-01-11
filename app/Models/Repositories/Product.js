@@ -38,10 +38,9 @@ class Product {
     await Promise.all(promises);
   }
 
-  // http://127.0.0.1:3333/products?filter[user_id]=2&filter[type_id]=2&filter[name]=veh&field=created_at&order=desc
+  // http://127.0.0.1:3333/products?page=1&filter[user_id]=2&filter[type_id]=2&filter[name]=veh&field=created_at&order=desc
   static async allProducts(req) {
-    const { filter = [], field = 'price', order = 'asc' } = req;
-    const page = 1;
+    const { page = 1, filter = [], field = 'price', order = 'asc' } = req;
 
     const query = this.query();
     Object.keys(filter).forEach(key => {
