@@ -1,7 +1,7 @@
 class StoreType {
   get rules() {
     return {
-      name: 'required|unique:types'
+      name: 'required|max:50|unique:types'
     };
   }
 }

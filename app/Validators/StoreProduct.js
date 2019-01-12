@@ -7,11 +7,9 @@ const existsFn = async (data, field, message, args, get) => {
     return;
   }
 
-  const typeIds = await Type.ids();
-
-  if (!typeIds.includes(value)) {
+  await Type.findOrFail(value).catch(() => {
     throw message;
-  }
+  });
 };
 Validator.extend('exists', existsFn);
 
@@ -23,19 +21,15 @@ const checkFn = async (data, field, message, args, get) => {
 
   const [typeId] = args;
   const type = await Type.findOrFail(typeId);
-  const typeCount = await type.attributes().getCount();
-
-  if (parseInt(typeCount, 10) !== values.length) {
-    throw message;
-  }
-
   const attrIds = await type.attributes().ids();
-  let uniqId = 0;
-  for (const val of values) {
-    if (!attrIds.includes(val.id) || uniqId === val.id) {
-      throw message;
-    }
-    uniqId = val.id;
+
+  const valIds = [];
+  values.forEach(val => {
+    valIds.push(val.id);
+  });
+
+  if (attrIds.length !== valIds.length || !attrIds.every(e => valIds.includes(e))) {
+    throw message;
   }
 };
 Validator.extend('check', checkFn);
@@ -45,15 +39,11 @@ class StoreProduct {
     const { type } = this.ctx.request.all();
 
     return {
-      name: 'required|string',
-      type: 'required|integer|exists',
-      price: 'required|integer',
+      name: 'required|string|max:50',
+      type: 'required|integer|above:1|exists',
+      price: 'required|integer|above:0',
       attributes: `required|array|check:${type}`
     };
-  }
-
-  async fails(errorMessages) {
-    return this.ctx.response.send(errorMessages);
   }
 }
 
