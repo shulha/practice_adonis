@@ -12,15 +12,7 @@ class AttributeProductAlterColumnTypeSchema extends Schema {
     });
   }
 
-  down() {
-    this.table('attribute_product', table => {
-      table
-        .jsonb('value')
-        .notNullable()
-        .default('{}')
-        .alter();
-    });
-  }
+  down() {}
 }
 
 module.exports = AttributeProductAlterColumnTypeSchema;
