@@ -23,10 +23,7 @@ const checkFn = async (data, field, message, args, get) => {
   const type = await Type.findOrFail(typeId);
   const attrIds = await type.attributes().ids();
 
-  const valIds = [];
-  values.forEach(val => {
-    valIds.push(val.id);
-  });
+  const valIds = values.map(val => val.id);
 
   if (attrIds.length !== valIds.length || !attrIds.every(e => valIds.includes(e))) {
     throw message;
