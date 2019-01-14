@@ -16,19 +16,22 @@ const Route = use('Route');
 
 Route.get('/', () => ({ status: 'Ok', version: '1.0.0' }));
 
-Route.post('/login', 'AuthController.login');
+Route.post('/login', 'AuthController.login').middleware('guest');
 Route.post('/logout', 'AuthController.logout');
 
 Route.resource('products', 'ProductController')
   .apiOnly()
-  .validator(new Map([[['products.store'], ['StoreProduct']], [['products.update'], ['StoreProduct']]]));
+  .validator(new Map([[['products.store'], ['StoreProduct']], [['products.update'], ['StoreProduct']]]))
+  .middleware(new Map([[['store', 'update', 'destroy'], ['auth']]]));
 
 Route.resource('types', 'TypeController')
   .apiOnly()
-  .validator(new Map([[['types.store'], ['StoreType']], [['types.update'], ['StoreType']]]));
+  .validator(new Map([[['types.store'], ['StoreType']], [['types.update'], ['StoreType']]]))
+  .middleware(['auth', 'is:admin']);
 
 Route.resource('types.attributes', 'AttributeController')
   .apiOnly()
   .validator(
     new Map([[['types.attributes.store'], ['StoreAttribute']], [['types.attributes.update'], ['StoreAttribute']]])
-  );
+  )
+  .middleware(['auth', 'is:admin']);

@@ -1,6 +1,9 @@
 class AuthController {
-  async login() {
-    return { status: 'Ok', login: 'success' };
+  async login({ request, auth }) {
+    const { username, password } = request.all();
+    await auth.attempt(username, password);
+
+    return 'Logged in successfully';
   }
 
   async logout() {
