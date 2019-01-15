@@ -1,9 +1,8 @@
 class AuthController {
   async login({ request, auth }) {
     const { username, password } = request.all();
-    await auth.attempt(username, password);
 
-    return 'Logged in successfully';
+    return auth.attempt(username, password);
   }
 
   async logout() {

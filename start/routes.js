@@ -17,12 +17,12 @@ const Route = use('Route');
 Route.get('/', () => ({ status: 'Ok', version: '1.0.0' }));
 
 Route.post('/login', 'AuthController.login').middleware('guest');
-Route.post('/logout', 'AuthController.logout');
+Route.post('/logout', 'AuthController.logout').middleware('auth');
 
 Route.resource('products', 'ProductController')
   .apiOnly()
   .validator(new Map([[['products.store'], ['StoreProduct']], [['products.update'], ['StoreProduct']]]))
-  .middleware(new Map([[['store', 'update', 'destroy'], ['auth']]]));
+  .middleware(new Map([[['store', 'update', 'destroy'], ['auth']], [['update', 'destroy'], ['auth', 'checkUser']]]));
 
 Route.resource('types', 'TypeController')
   .apiOnly()
