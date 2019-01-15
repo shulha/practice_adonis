@@ -22,7 +22,7 @@ Route.post('/logout', 'AuthController.logout').middleware('auth');
 Route.resource('products', 'ProductController')
   .apiOnly()
   .validator(new Map([[['products.store'], ['StoreProduct']], [['products.update'], ['StoreProduct']]]))
-  .middleware(new Map([[['store', 'update', 'destroy'], ['auth']], [['update', 'destroy'], ['auth', 'checkUser']]]));
+  .middleware(new Map([[['store', 'update', 'destroy'], ['auth']], [['update', 'destroy'], ['checkUser']]]));
 
 Route.resource('types', 'TypeController')
   .apiOnly()
