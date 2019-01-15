@@ -21,15 +21,15 @@ class ProductController {
    * Create/save a new product.
    * POST products
    *
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
+   * @param auth
+   * @param request
+   * @param response
    *
    * @returns {Promise<*>}
    */
-  async store({ request, response }) {
+  async store({ auth, request, response }) {
     const { name, type, price, attributes } = request.all();
-
-    const userId = 2; // TODO auth
+    const userId = auth.user.id;
 
     await Product.createProduct({ userId, name, type, price, attributes });
 
